@@ -4,6 +4,7 @@ pacman::p_load(tidyverse, haven, anchors, dummies)
 
 data.og <- data.original <- read_dta("./data_raw/NDI_Ukraine_Combined.dta")
 spatial <- read_rds("./data_clean/spatial_survey_data.rds")
+first_wave <- read_dta("./data_raw/NDI_Ukraine_Round1_Final.dta") # original coding
 
 temp <- data.og %>% dplyr::select(c(## Outcome Variables
                                     # Why was Boris Nemstov killed (wave 1)
@@ -179,17 +180,20 @@ data <- cbind(spatial, temp)
 #print(checkup[101:150])
 #print(checkup[151:colnum2])
 
-# Coding -8 and -9 as NAs for all variables
+# Coding -7, -8 and -9 as NAs for all variables
 data <-  data %>% mutate_if(is.numeric, funs(ifelse(. %in% c(-8., -9, -7), NA, .)))
 
 # MH17 - Wave 8 has option for Russia - probs will have to treat it as "Other"
-#wave8 <- dplyr::filter(data, wave == 8) 
-#notwave8 <- dplyr::filter(data, wave != 8) 
-#sum(wave8$MH17 == 97, na.rm = T)
-#sum(wave8$MH17 == 4, na.rm = T)
-#sum(notwave8$MH17 == 97, na.rm = T)
-#sum(notwave8$MH17 == 4, na.rm = T)
-data <- replace.value(data, "MH17", from = 97, to = 4) # should replace 97 to 4?
+attributes(data$MH17)
+table(data$MH17)
+wave8 <- dplyr::filter(data, wave == 8) 
+notwave8 <- dplyr::filter(data, wave != 8) 
+sum(wave8$MH17 == 97, na.rm = T) # other (28)
+sum(wave8$MH17 == 4, na.rm = T) # Russia (2413)
+sum(notwave8$MH17 == 97, na.rm = T) # ???? (780)  # What are these
+sum(notwave8$MH17 == 4, na.rm = T) # ???? (497)
+
+data <- replace.value(data, "MH17", from = 97, to = 4) # make 97s 4 (for now)
 
 # Recoding binary Boris Nemtsov variables to a single categorical one
 data$BORISASS <- NA
@@ -213,7 +217,6 @@ for(i in 1:nrow(filter(data, wave == 1))) {
 
 #data$BORISASS <- factor(data$BORISASS)
 #data$BORISASS <- relevel(data$BORISASS, ref = "Who?")
-
 
 # Propaganda
 data <- replace.value(data, "INFPRORI", from = 97, to = 4)
@@ -275,6 +278,14 @@ data <- anchors::replace.value(data, c("INFSOUFC_grouped", "INFSOUSC_grouped"),
                                to = 5, from = 11) # Friends and family
 data <- anchors::replace.value(data, c("INFSOUFC_grouped", "INFSOUSC_grouped"), 
                                to = 6, from = 12) # Other
+
+# creating dummies (will need them when we use simcf)
+data$UkrMedia <- ifelse(data$INFSOUFC_grouped == 1, 1, 0)
+data$RusMedia <- ifelse(data$INFSOUFC_grouped == 2, 1, 0)
+data$WestMedia <- ifelse(data$INFSOUFC_grouped == 3, 1, 0)
+data$Newspaper <- ifelse(data$INFSOUFC_grouped == 4, 1, 0)
+data$FrndFam <- ifelse(data$INFSOUFC_grouped == 5, 1, 0)
+data$InfOther <- ifelse(data$INFSOUFC_grouped == 6, 1, 0)
 
 # Composite measure for  HEAR___ questions (anomia) HEARINDEX 
 pacman::p_load(ltm)
@@ -374,6 +385,10 @@ data <- replace.value(data, "Religious", to = 0, from = 7)
 
 # CSBLAME - Other (97 to 9)
 data <- replace.value(data, "CSBLAME", to = 9, from = 97)
+
+# Taking raked weight from wave 1 and inputting it into entire dataset
+### MAKE SURE RAKED WEIGHT IS THE SAME AS INDWT ###
+data$indwt[1:nrow(dplyr::filter(data, wave == 1))] <- first_wave$rakedwt 
 
 # Should I make a minority ethnicity level instead/also? - minorities believe more in conspiracies
 
