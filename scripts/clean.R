@@ -287,6 +287,12 @@ data$Newspaper <- ifelse(data$INFSOUFC_grouped == 4, 1, 0)
 data$FrndFam <- ifelse(data$INFSOUFC_grouped == 5, 1, 0)
 data$InfOther <- ifelse(data$INFSOUFC_grouped == 6, 1, 0)
 
+# Main info source (wave 7)
+data$TV_source <- ifelse(data$INFSOMAI == 1, 1, 0)
+data$INT_source <- ifelse(data$INFSOMAI == 2, 1, 0)
+data$SOC_source <- ifelse(data$INFSOMAI == 3, 1, 0)
+data$Other_source <- ifelse(data$INFSOMAI == 97, 1, 0)
+
 # Composite measure for  HEAR___ questions (anomia) HEARINDEX 
 pacman::p_load(ltm)
 heardat <- dplyr::select(data, (c("HEARPRES", # President
@@ -353,6 +359,7 @@ for(i in 1:nrow(filter(data, wave == 1))) {
 # Kyiv 2
 
 data$data_region_Kyiv_city <- ifelse(data$oblast == 2, 1, 0)
+
 data$data_region_West <- ifelse(data$oblast == 11 | 
                                    data$oblast == 14 | 
                                    data$oblast == 20 |
@@ -361,14 +368,17 @@ data$data_region_West <- ifelse(data$oblast == 11 |
                                    data$oblast == 9 |
                                    data$oblast == 5 |
                                    data$oblast == 18, 1, 0)
+
 data$data_region_South <- ifelse(data$oblast == 16 |
                                     data$oblast == 15 |
                                     data$oblast == 22, 1, 0)
+
 data$data_region_East <- ifelse(data$oblast == 6 |
                                    data$oblast == 21 |
                                    data$oblast == 7 |
                                    data$oblast == 13 |
                                    data$oblast == 10, 1, 0)
+
 data$data_region_Center_North <- ifelse(data$oblast == 26 |
                                            data$oblast == 24 |
                                            data$oblast == 3 |
@@ -378,7 +388,6 @@ data$data_region_Center_North <- ifelse(data$oblast == 26 |
                                            data$oblast == 4 |
                                            data$oblast == 8, 1, 0)
 
-# New religion variable -> religious v. not religious
 data$Religious <- data$RSPRELIG
 data <- replace.value(data, "Religious", to = 1, from = c(2,3,4,5,6))
 data <- replace.value(data, "Religious", to = 0, from = 7)
@@ -388,7 +397,8 @@ data <- replace.value(data, "CSBLAME", to = 9, from = 97)
 
 # Taking raked weight from wave 1 and inputting it into entire dataset
 ### MAKE SURE RAKED WEIGHT IS THE SAME AS INDWT ###
-data$indwt[1:nrow(dplyr::filter(data, wave == 1))] <- first_wave$rakedwt 
+#data$indwt[1:nrow(dplyr::filter(data, wave == 1))] <- first_wave$rakedwt
+data$indwt[1:nrow(dplyr::filter(data, wave == 1))] <- first_wave$unrakedwt
 
 # Should I make a minority ethnicity level instead/also? - minorities believe more in conspiracies
 
