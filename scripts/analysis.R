@@ -1239,7 +1239,7 @@ mlogit.fd.MH17.4 <- mlogitsimfd(xhyp.1, b = simB, ci = 0.95,
 
 # Scenario 5: Moving from LSCONTNT 2 to 1
 xhyp.1 <- cfChange(xhyp.1, "LSNEXTGN", x=2, xpre =2, scen=1)
-xhyp.1 <- cfChange(xhyp.1, "LSCONTNT", x=1, xpre =2, scen=1)
+xhyp.1 <- cfChange(xhyp.1, "LSCONTNT", x=1, xpre =3, scen=1)
 
 CONTNT_MH17_5 <- mlogit.fd.MH17.5 <- mlogitsimfd(xhyp.1, b = simB, ci = 0.95, 
                                 constant = 1);mlogit.fd.MH17.5
@@ -1326,7 +1326,7 @@ Scenario <- c(rep("LSNEXTGN \n 2 -> 1 \n (1, 4 & 7)", 4),
               rep("DEMLEVEL \n 2 -> 1 (1 & 4)", 4),
               rep("DEMLEVEL \n 2 -> 1 (8)", 4),
               rep("LSIMPRVE \n 2 -> 1 (7)", 4),
-              rep("LSCONTNT \n 2 -> 1 (7)", 4))
+              rep("LSCONTNT \n 3 -> 1 (7)", 4))
 Outcomes <- rep(c("Mechanical", "Rebels", "Military", "Other"), nrow(PEs)/4)
 PEs <- cbind(Scenario, Outcomes, PEs)
 

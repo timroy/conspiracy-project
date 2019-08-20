@@ -29,6 +29,6 @@ run_replication <- function(clean = FALSE, # clean.R
   }
 }
 
-run_replication(clean = F, 
+run_replication(clean = T, 
                 #get.distances = T, merge = T, 
                 analyze = T)
